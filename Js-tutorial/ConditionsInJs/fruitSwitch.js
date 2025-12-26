@@ -1,4 +1,4 @@
-const fruitType = 'Oranges';
+const fruitType = 'Bananas';
 
 switch(fruitType){
     case "Oranges":
