@@ -1,0 +1,2469 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="mock-csrf-token-abc123" />
+    <title>Multi-Table Admin — tryDelete Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    />
+    <style>
+      :root {
+        --font: "Plus Jakarta Sans", sans-serif;
+        --bg: #f5f6fa;
+        --surface: #ffffff;
+        --border: #e8eaef;
+        --text-1: #111827;
+        --text-2: #4b5563;
+        --text-3: #9ca3af;
+        --brand: #6366f1;
+        --brand-dk: #4f46e5;
+        --red: #ef4444;
+        --green: #22c55e;
+        --amber: #f59e0b;
+        --cyan: #06b6d4;
+        --pink: #ec4899;
+        --r: 10px;
+        --rl: 14px;
+        --rx: 18px;
+        --ease: 170ms cubic-bezier(0.4, 0, 0.2, 1);
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-md:
+          0 4px 16px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text-1);
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
+
+      .shell {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 230px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 1.5rem 1rem;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+      }
+      .sidebar-logo {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-1);
+        padding: 0.5rem 0.75rem 1.25rem;
+        letter-spacing: -0.03em;
+      }
+      .sidebar-logo span {
+        color: var(--brand);
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.55rem 0.75rem;
+        border-radius: var(--r);
+        font-size: 0.855rem;
+        font-weight: 500;
+        color: var(--text-2);
+        cursor: pointer;
+        transition: var(--ease);
+        text-decoration: none;
+      }
+      .nav-item:hover {
+        background: #f3f4f6;
+        color: var(--text-1);
+      }
+      .nav-item.active {
+        background: #eef2ff;
+        color: var(--brand);
+        font-weight: 600;
+      }
+      .nav-item i {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+      }
+      .nav-section {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-3);
+        padding: 0.75rem 0.75rem 0.25rem;
+      }
+
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* Topbar */
+      .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0.9rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .topbar-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--brand), var(--brand-dk));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+      }
+
+      /* Section header */
+      .section-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+      }
+      .section-hdr:first-child {
+        margin-top: 0;
+      }
+      .section-hdr h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .section-hdr h2 i {
+        font-size: 0.95rem;
+        color: var(--text-3);
+      }
+      .section-hdr p {
+        font-size: 0.78rem;
+        color: var(--text-3);
+        margin: 0.1rem 0 0;
+      }
+
+      /* Toolbar */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+      }
+      .search-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 0.45rem 0.85rem;
+        flex: 1;
+        max-width: 260px;
+      }
+      .search-box input {
+        border: none;
+        outline: none;
+        font-family: var(--font);
+        font-size: 0.855rem;
+        color: var(--text-1);
+        background: transparent;
+        width: 100%;
+      }
+      .search-box i {
+        color: var(--text-3);
+        font-size: 0.9rem;
+      }
+      .btn-toolbar {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: var(--font);
+        font-size: 0.845rem;
+        font-weight: 600;
+        padding: 0.45rem 1rem;
+        border-radius: var(--r);
+        cursor: pointer;
+        transition: var(--ease);
+        border: 1.5px solid var(--border);
+        background: var(--surface);
+        color: var(--text-2);
+        white-space: nowrap;
+      }
+      .btn-toolbar:hover {
+        border-color: #c4c9d4;
+        background: #f9fafb;
+      }
+      .btn-toolbar.primary {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: #fff;
+      }
+      .btn-toolbar.primary:hover {
+        background: var(--brand-dk);
+        border-color: var(--brand-dk);
+      }
+
+      /* Table card */
+      .table-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--rx);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+      }
+      .table-card-head {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .table-card-head-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .table-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+      .table-card-head h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin: 0;
+      }
+      .table-card-head p {
+        font-size: 0.8rem;
+        color: var(--text-3);
+        margin: 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead th {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-3);
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      tbody tr {
+        transition: background var(--ease);
+      }
+      tbody tr:hover {
+        background: #fafbfc;
+      }
+      tbody td {
+        padding: 0.9rem 1.25rem;
+        font-size: 0.865rem;
+        color: var(--text-2);
+        border-bottom: 1px solid var(--border);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Badges */
+      .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2em 0.65em;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .badge-pill.green {
+        background: #f0fdf4;
+        color: #15803d;
+      }
+      .badge-pill.red {
+        background: #fef2f2;
+        color: #b91c1c;
+      }
+      .badge-pill.amber {
+        background: #fffbeb;
+        color: #b45309;
+      }
+      .badge-pill.blue {
+        background: #eff6ff;
+        color: #1d4ed8;
+      }
+      .badge-pill.purple {
+        background: #f5f3ff;
+        color: #6d28d9;
+      }
+      .badge-pill.cyan {
+        background: #ecfeff;
+        color: #0e7490;
+      }
+      .badge-pill.pink {
+        background: #fdf2f8;
+        color: #9d174d;
+      }
+      .badge-pill.slate {
+        background: #f8fafc;
+        color: #475569;
+      }
+      .badge-pill i {
+        font-size: 0.55rem;
+      }
+
+      /* Name cell */
+      .name-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+      }
+      .name-av {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.72rem;
+        flex-shrink: 0;
+      }
+      .name-av.round {
+        border-radius: 50%;
+      }
+      .name-primary {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-1);
+      }
+      .name-secondary {
+        font-size: 0.775rem;
+        color: var(--text-3);
+      }
+
+      /* Linked indicator */
+      .linked-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        border-radius: 6px;
+        padding: 0.18rem 0.55rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .linked-badge.yes {
+        background: #eef2ff;
+        color: var(--brand);
+      }
+      .linked-badge.no {
+        background: #f3f4f6;
+        color: var(--text-2);
+      }
+
+      /* Actions */
+      .action-group {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        justify-content: flex-end;
+      }
+      .btn-action {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--r);
+        border: 1.5px solid var(--border);
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        color: var(--text-3);
+        cursor: pointer;
+        transition: var(--ease);
+      }
+      .btn-action:hover {
+        background: #f3f4f6;
+        border-color: #c4c9d4;
+        color: var(--text-1);
+      }
+      .btn-action.danger:hover {
+        background: #fef2f2;
+        border-color: #fca5a5;
+        color: var(--red);
+      }
+
+      /* Row exit */
+      @keyframes row-out {
+        0% {
+          opacity: 1;
+          transform: none;
+        }
+        60% {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+        100% {
+          opacity: 0;
+          max-height: 0;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+      }
+      .row-exit td {
+        animation: row-out 0.35s ease forwards;
+        overflow: hidden;
+      }
+
+      /* Pager */
+      .pager {
+        padding: 0.85rem 1.5rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--text-3);
+      }
+      .pager-btns {
+        display: flex;
+        gap: 0.35rem;
+      }
+      .pager-btn {
+        padding: 0.3rem 0.65rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--text-2);
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: var(--ease);
+      }
+      .pager-btn:hover {
+        background: #f3f4f6;
+      }
+      .pager-btn.active {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: #fff;
+      }
+
+      /* Empty */
+      .empty-row td {
+        padding: 3rem;
+        text-align: center;
+        color: var(--text-3);
+      }
+      .empty-icon {
+        font-size: 2.2rem;
+        opacity: 0.2;
+        display: block;
+        margin-bottom: 0.65rem;
+      }
+
+      /* Progress bar */
+      .progress-bar-wrap {
+        width: 100px;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .progress-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s;
+      }
+
+      /* Rating stars */
+      .stars {
+        color: #f59e0b;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+      }
+
+      /* Divider between table groups */
+      .group-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 2.5rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-logo">admin<span>.</span></div>
+        <div class="nav-section">Main</div>
+        <a class="nav-item"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+        <a class="nav-item active"><i class="bi bi-table"></i>All Tables</a>
+        <div class="nav-section">Entities</div>
+        <a class="nav-item"><i class="bi bi-people"></i>Users</a>
+        <a class="nav-item"><i class="bi bi-box-seam"></i>Products</a>
+        <a class="nav-item"><i class="bi bi-cart3"></i>Orders</a>
+        <a class="nav-item"><i class="bi bi-file-text"></i>Invoices</a>
+        <a class="nav-item"><i class="bi bi-chat-dots"></i>Reviews</a>
+        <a class="nav-item"><i class="bi bi-tag"></i>Coupons</a>
+        <div class="nav-section">System</div>
+        <a class="nav-item"><i class="bi bi-gear"></i>Settings</a>
+        <a class="nav-item"><i class="bi bi-bar-chart-line"></i>Analytics</a>
+      </aside>
+
+      <!-- Main -->
+      <div class="main">
+        <div class="topbar">
+          <div>
+            <div class="topbar-title">Multi-Table Delete Demo</div>
+          </div>
+          <div class="topbar-right">
+            <button class="btn-toolbar"><i class="bi bi-bell"></i></button>
+            <div class="avatar">JD</div>
+          </div>
+        </div>
+
+        <div class="content">
+          <!-- ══════════════════════════════════════════
+           TABLE 1 — USERS
+      ══════════════════════════════════════════ -->
+          <div class="section-hdr">
+            <div>
+              <h2><i class="bi bi-people"></i>Users</h2>
+              <p>
+                Platform accounts — some have linked orders, invoices, tickets
+              </p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="bi bi-search"></i
+              ><input
+                placeholder="Search users…"
+                oninput="filterTable('users', this.value)"
+              />
+            </div>
+            <button class="btn-toolbar primary ms-auto">
+              <i class="bi bi-plus-lg me-1"></i>Add User
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-card-head">
+              <div class="table-card-head-left">
+                <div
+                  class="table-icon"
+                  style="background: #eef2ff; color: var(--brand)"
+                >
+                  <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                  <h3>All Users</h3>
+                  <p id="users-count">8 users total</p>
+                </div>
+              </div>
+              <button
+                class="btn-toolbar"
+                style="font-size: 0.78rem; padding: 0.35rem 0.75rem"
+              >
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+            </div>
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 36px">
+                      <input
+                        type="checkbox"
+                        style="accent-color: var(--brand)"
+                      />
+                    </th>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Linked</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <span
+                >Showing <strong id="users-showing">8</strong> of
+                <strong id="users-total">8</strong></span
+              >
+              <div class="pager-btns">
+                <button class="pager-btn">‹</button
+                ><button class="pager-btn active">1</button
+                ><button class="pager-btn">›</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════
+           TABLE 2 — PRODUCTS
+      ══════════════════════════════════════════ -->
+          <div class="section-hdr">
+            <div>
+              <h2><i class="bi bi-box-seam"></i>Products</h2>
+              <p>Catalogue items — some linked to active orders</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="bi bi-search"></i
+              ><input
+                placeholder="Search products…"
+                oninput="filterTable('products', this.value)"
+              />
+            </div>
+            <button class="btn-toolbar primary ms-auto">
+              <i class="bi bi-plus-lg me-1"></i>Add Product
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-card-head">
+              <div class="table-card-head-left">
+                <div
+                  class="table-icon"
+                  style="background: #f0fdf4; color: #15803d"
+                >
+                  <i class="bi bi-box-seam-fill"></i>
+                </div>
+                <div>
+                  <h3>All Products</h3>
+                  <p id="products-count">6 products total</p>
+                </div>
+              </div>
+              <button
+                class="btn-toolbar"
+                style="font-size: 0.78rem; padding: 0.35rem 0.75rem"
+              >
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+            </div>
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 36px">
+                      <input
+                        type="checkbox"
+                        style="accent-color: var(--brand)"
+                      />
+                    </th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Linked</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="products-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <span
+                >Showing <strong id="products-showing">6</strong> of
+                <strong id="products-total">6</strong></span
+              >
+              <div class="pager-btns">
+                <button class="pager-btn">‹</button
+                ><button class="pager-btn active">1</button
+                ><button class="pager-btn">›</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════
+           TABLE 3 — ORDERS
+      ══════════════════════════════════════════ -->
+          <div class="section-hdr">
+            <div>
+              <h2><i class="bi bi-cart3"></i>Orders</h2>
+              <p>Customer orders — linked to invoices and fulfilment records</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="bi bi-search"></i
+              ><input
+                placeholder="Search orders…"
+                oninput="filterTable('orders', this.value)"
+              />
+            </div>
+            <button class="btn-toolbar primary ms-auto">
+              <i class="bi bi-plus-lg me-1"></i>New Order
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-card-head">
+              <div class="table-card-head-left">
+                <div
+                  class="table-icon"
+                  style="background: #fffbeb; color: #b45309"
+                >
+                  <i class="bi bi-cart-fill"></i>
+                </div>
+                <div>
+                  <h3>All Orders</h3>
+                  <p id="orders-count">5 orders total</p>
+                </div>
+              </div>
+              <button
+                class="btn-toolbar"
+                style="font-size: 0.78rem; padding: 0.35rem 0.75rem"
+              >
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+            </div>
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 36px">
+                      <input
+                        type="checkbox"
+                        style="accent-color: var(--brand)"
+                      />
+                    </th>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Linked</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <span
+                >Showing <strong id="orders-showing">5</strong> of
+                <strong id="orders-total">5</strong></span
+              >
+              <div class="pager-btns">
+                <button class="pager-btn">‹</button
+                ><button class="pager-btn active">1</button
+                ><button class="pager-btn">›</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════
+           TABLE 4 — INVOICES
+      ══════════════════════════════════════════ -->
+          <div class="section-hdr">
+            <div>
+              <h2><i class="bi bi-file-text"></i>Invoices</h2>
+              <p>Billing documents — some attached to payment records</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="bi bi-search"></i
+              ><input
+                placeholder="Search invoices…"
+                oninput="filterTable('invoices', this.value)"
+              />
+            </div>
+            <button class="btn-toolbar primary ms-auto">
+              <i class="bi bi-plus-lg me-1"></i>New Invoice
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-card-head">
+              <div class="table-card-head-left">
+                <div
+                  class="table-icon"
+                  style="background: #ecfeff; color: #0e7490"
+                >
+                  <i class="bi bi-file-earmark-text-fill"></i>
+                </div>
+                <div>
+                  <h3>All Invoices</h3>
+                  <p id="invoices-count">5 invoices total</p>
+                </div>
+              </div>
+              <button
+                class="btn-toolbar"
+                style="font-size: 0.78rem; padding: 0.35rem 0.75rem"
+              >
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+            </div>
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 36px">
+                      <input
+                        type="checkbox"
+                        style="accent-color: var(--brand)"
+                      />
+                    </th>
+                    <th>Invoice</th>
+                    <th>Issued To</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>Due</th>
+                    <th>Linked</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="invoices-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <span
+                >Showing <strong id="invoices-showing">5</strong> of
+                <strong id="invoices-total">5</strong></span
+              >
+              <div class="pager-btns">
+                <button class="pager-btn">‹</button
+                ><button class="pager-btn active">1</button
+                ><button class="pager-btn">›</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════
+           TABLE 5 — REVIEWS
+      ══════════════════════════════════════════ -->
+          <div class="section-hdr">
+            <div>
+              <h2><i class="bi bi-chat-dots"></i>Reviews</h2>
+              <p>Product reviews — most are standalone and deletable</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="bi bi-search"></i
+              ><input
+                placeholder="Search reviews…"
+                oninput="filterTable('reviews', this.value)"
+              />
+            </div>
+            <button class="btn-toolbar primary ms-auto">
+              <i class="bi bi-plus-lg me-1"></i>Add Review
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-card-head">
+              <div class="table-card-head-left">
+                <div
+                  class="table-icon"
+                  style="background: #fdf2f8; color: #9d174d"
+                >
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <div>
+                  <h3>All Reviews</h3>
+                  <p id="reviews-count">5 reviews total</p>
+                </div>
+              </div>
+              <button
+                class="btn-toolbar"
+                style="font-size: 0.78rem; padding: 0.35rem 0.75rem"
+              >
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+            </div>
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 36px">
+                      <input
+                        type="checkbox"
+                        style="accent-color: var(--brand)"
+                      />
+                    </th>
+                    <th>Reviewer</th>
+                    <th>Product</th>
+                    <th>Rating</th>
+                    <th>Status</th>
+                    <th>Linked</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="reviews-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <span
+                >Showing <strong id="reviews-showing">5</strong> of
+                <strong id="reviews-total">5</strong></span
+              >
+              <div class="pager-btns">
+                <button class="pager-btn">‹</button
+                ><button class="pager-btn active">1</button
+                ><button class="pager-btn">›</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════
+           TABLE 6 — COUPONS
+      ══════════════════════════════════════════ -->
+          <div class="section-hdr">
+            <div>
+              <h2><i class="bi bi-tag"></i>Coupons</h2>
+              <p>Discount codes — some used in orders, others unused</p>
+            </div>
+          </div>
+          <div class="toolbar">
+            <div class="search-box">
+              <i class="bi bi-search"></i
+              ><input
+                placeholder="Search coupons…"
+                oninput="filterTable('coupons', this.value)"
+              />
+            </div>
+            <button class="btn-toolbar primary ms-auto">
+              <i class="bi bi-plus-lg me-1"></i>New Coupon
+            </button>
+          </div>
+          <div class="table-card">
+            <div class="table-card-head">
+              <div class="table-card-head-left">
+                <div
+                  class="table-icon"
+                  style="background: #f5f3ff; color: #6d28d9"
+                >
+                  <i class="bi bi-tag-fill"></i>
+                </div>
+                <div>
+                  <h3>All Coupons</h3>
+                  <p id="coupons-count">5 coupons total</p>
+                </div>
+              </div>
+              <button
+                class="btn-toolbar"
+                style="font-size: 0.78rem; padding: 0.35rem 0.75rem"
+              >
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+              </button>
+            </div>
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 36px">
+                      <input
+                        type="checkbox"
+                        style="accent-color: var(--brand)"
+                      />
+                    </th>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th>Discount</th>
+                    <th>Expires</th>
+                    <th>Linked</th>
+                    <th style="text-align: right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="coupons-tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager">
+              <span
+                >Showing <strong id="coupons-showing">5</strong> of
+                <strong id="coupons-total">5</strong></span
+              >
+              <div class="pager-btns">
+                <button class="pager-btn">‹</button
+                ><button class="pager-btn active">1</button
+                ><button class="pager-btn">›</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /content -->
+      </div>
+      <!-- /main -->
+    </div>
+    <!-- /shell -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+     MOCK DATA — 6 separate models
+══════════════════════════════════════════════════════════════ -->
+    <script>
+      const COLORS = [
+        "#6366f1",
+        "#8b5cf6",
+        "#ec4899",
+        "#f59e0b",
+        "#10b981",
+        "#3b82f6",
+        "#ef4444",
+        "#14b8a6",
+      ];
+
+      /* 1. USERS */
+      const USERS = [
+        {
+          pk: 1,
+          name: "Alice Johnson",
+          email: "alice@co.com",
+          role: "Admin",
+          status: "active",
+          joined: "12 Jan 2023",
+          initials: "AJ",
+          color: COLORS[0],
+          related: {
+            Orders: [
+              { id: 1, label: "Order #1001 — $250.00" },
+              { id: 2, label: "Order #1002 — $89.99" },
+            ],
+            Invoices: [
+              { id: 10, label: "INV-2024-0042" },
+              { id: 11, label: "INV-2024-0043" },
+            ],
+            Tickets: [
+              { id: 50, label: "#50 — Login issue" },
+              { id: 51, label: "#51 — Billing query" },
+            ],
+          },
+        },
+        {
+          pk: 2,
+          name: "Bob Martinez",
+          email: "bob@co.com",
+          role: "Editor",
+          status: "active",
+          joined: "3 Mar 2023",
+          initials: "BM",
+          color: COLORS[1],
+          related: { Orders: [{ id: 4, label: "Order #2001 — $499.00" }] },
+        },
+        {
+          pk: 3,
+          name: "Carol Singh",
+          email: "carol@co.com",
+          role: "Viewer",
+          status: "active",
+          joined: "18 Apr 2023",
+          initials: "CS",
+          color: COLORS[2],
+          related: { Orders: [{ id: 6, label: "Order #3001 — $75.00" }] },
+        },
+        {
+          pk: 4,
+          name: "Dave Kim",
+          email: "dave@co.com",
+          role: "Editor",
+          status: "pending",
+          joined: "2 Jun 2023",
+          initials: "DK",
+          color: COLORS[3],
+          related: {},
+        },
+        {
+          pk: 5,
+          name: "Eva Torres",
+          email: "eva@co.com",
+          role: "Viewer",
+          status: "inactive",
+          joined: "14 Jul 2023",
+          initials: "ET",
+          color: COLORS[4],
+          related: {},
+        },
+        {
+          pk: 6,
+          name: "Frank Osei",
+          email: "frank@co.com",
+          role: "Admin",
+          status: "active",
+          joined: "30 Aug 2023",
+          initials: "FO",
+          color: COLORS[5],
+          related: {
+            Orders: [{ id: 7, label: "Order #4001 — $999.00" }],
+            Invoices: [{ id: 12, label: "INV-2024-0099" }],
+          },
+        },
+        {
+          pk: 7,
+          name: "Grace Lee",
+          email: "grace@co.com",
+          role: "Viewer",
+          status: "active",
+          joined: "5 Oct 2023",
+          initials: "GL",
+          color: COLORS[6],
+          related: {},
+        },
+        {
+          pk: 8,
+          name: "Hiro Tanaka",
+          email: "hiro@co.com",
+          role: "Editor",
+          status: "active",
+          joined: "22 Nov 2023",
+          initials: "HT",
+          color: COLORS[7],
+          related: { Orders: [{ id: 9, label: "Order #5001 — $55.00" }] },
+        },
+      ];
+
+      /* 2. PRODUCTS */
+      const PRODUCTS = [
+        {
+          pk: 101,
+          name: "Pro Wireless Headset",
+          sku: "HW-001",
+          category: "Electronics",
+          price: "$149.99",
+          stock: 34,
+          color: COLORS[0],
+          related: {
+            Orders: [
+              { id: 1, label: "Order #1001" },
+              { id: 4, label: "Order #2001" },
+            ],
+            Reviews: [{ id: 201, label: "★★★★★ — Great sound!" }],
+          },
+        },
+        {
+          pk: 102,
+          name: "Mechanical Keyboard",
+          sku: "KB-002",
+          category: "Electronics",
+          price: "$89.99",
+          stock: 17,
+          color: COLORS[1],
+          related: { Orders: [{ id: 2, label: "Order #1002" }] },
+        },
+        {
+          pk: 103,
+          name: "Standing Desk",
+          sku: "FN-003",
+          category: "Furniture",
+          price: "$349.00",
+          stock: 8,
+          color: COLORS[2],
+          related: {
+            Orders: [{ id: 6, label: "Order #3001" }],
+            Invoices: [{ id: 10, label: "INV-2024-0042" }],
+            Warranties: [{ id: 301, label: "WR-2024-081" }],
+          },
+        },
+        {
+          pk: 104,
+          name: "USB-C Hub 7-in-1",
+          sku: "AC-004",
+          category: "Accessories",
+          price: "$39.99",
+          stock: 112,
+          color: COLORS[3],
+          related: {},
+        },
+        {
+          pk: 105,
+          name: "Webcam 4K",
+          sku: "VC-005",
+          category: "Electronics",
+          price: "$129.99",
+          stock: 22,
+          color: COLORS[5],
+          related: {},
+        },
+        {
+          pk: 106,
+          name: 'Laptop Sleeve 15"',
+          sku: "AC-006",
+          category: "Accessories",
+          price: "$24.99",
+          stock: 56,
+          color: COLORS[7],
+          related: {},
+        },
+      ];
+
+      /* 3. ORDERS */
+      const ORDERS = [
+        {
+          pk: 201,
+          ref: "#1001",
+          customer: "Alice Johnson",
+          status: "delivered",
+          total: "$250.00",
+          date: "15 Jan 2024",
+          related: {
+            Invoices: [{ id: 10, label: "INV-2024-0042" }],
+            Shipments: [
+              { id: 501, label: "SHP-5501 — UPS" },
+              { id: 502, label: "SHP-5502 — DHL" },
+            ],
+          },
+        },
+        {
+          pk: 202,
+          ref: "#1002",
+          customer: "Bob Martinez",
+          status: "processing",
+          total: "$499.00",
+          date: "2 Feb 2024",
+          related: { Invoices: [{ id: 11, label: "INV-2024-0043" }] },
+        },
+        {
+          pk: 203,
+          ref: "#1003",
+          customer: "Carol Singh",
+          status: "delivered",
+          total: "$75.00",
+          date: "19 Feb 2024",
+          related: {},
+        },
+        {
+          pk: 204,
+          ref: "#1004",
+          customer: "Frank Osei",
+          status: "pending",
+          total: "$999.00",
+          date: "5 Mar 2024",
+          related: {
+            Invoices: [{ id: 12, label: "INV-2024-0099" }],
+            Returns: [{ id: 601, label: "RTN-001 — Partial return" }],
+          },
+        },
+        {
+          pk: 205,
+          ref: "#1005",
+          customer: "Hiro Tanaka",
+          status: "cancelled",
+          total: "$55.00",
+          date: "10 Mar 2024",
+          related: {},
+        },
+      ];
+
+      /* 4. INVOICES */
+      const INVOICES = [
+        {
+          pk: 301,
+          ref: "INV-2024-0042",
+          issuedTo: "Alice Johnson",
+          status: "paid",
+          amount: "$250.00",
+          due: "28 Jan 2024",
+          related: {
+            Payments: [{ id: 701, label: "PAY-7001 — Stripe $250.00" }],
+          },
+        },
+        {
+          pk: 302,
+          ref: "INV-2024-0043",
+          issuedTo: "Bob Martinez",
+          status: "pending",
+          amount: "$499.00",
+          due: "16 Feb 2024",
+          related: {},
+        },
+        {
+          pk: 303,
+          ref: "INV-2024-0099",
+          issuedTo: "Frank Osei",
+          status: "overdue",
+          amount: "$999.00",
+          due: "19 Mar 2024",
+          related: {
+            Payments: [
+              { id: 702, label: "PAY-7002 — Wire transfer $500.00" },
+              { id: 703, label: "PAY-7003 — Wire transfer $499.00" },
+            ],
+            Disputes: [{ id: 801, label: "DSP-001 — Amount mismatch" }],
+          },
+        },
+        {
+          pk: 304,
+          ref: "INV-2024-0110",
+          issuedTo: "Grace Lee",
+          status: "paid",
+          amount: "$39.99",
+          due: "5 Apr 2024",
+          related: {},
+        },
+        {
+          pk: 305,
+          ref: "INV-2024-0120",
+          issuedTo: "Dave Kim",
+          status: "pending",
+          amount: "$89.99",
+          due: "20 Apr 2024",
+          related: {},
+        },
+      ];
+
+      /* 5. REVIEWS */
+      const REVIEWS = [
+        {
+          pk: 401,
+          reviewer: "Alice Johnson",
+          product: "Pro Wireless Headset",
+          rating: 5,
+          status: "approved",
+          related: {},
+        },
+        {
+          pk: 402,
+          reviewer: "Bob Martinez",
+          product: "Mechanical Keyboard",
+          rating: 4,
+          status: "approved",
+          related: {
+            Replies: [
+              { id: 901, label: "Admin reply — Thank you!" },
+              { id: 902, label: "Follow-up reply" },
+            ],
+          },
+        },
+        {
+          pk: 403,
+          reviewer: "Carol Singh",
+          product: "Standing Desk",
+          rating: 3,
+          status: "pending",
+          related: {},
+        },
+        {
+          pk: 404,
+          reviewer: "Hiro Tanaka",
+          product: "USB-C Hub 7-in-1",
+          rating: 5,
+          status: "approved",
+          related: {},
+        },
+        {
+          pk: 405,
+          reviewer: "Eva Torres",
+          product: "Webcam 4K",
+          rating: 2,
+          status: "flagged",
+          related: {
+            Reports: [
+              { id: 1001, label: "RPT-001 — Spam suspected" },
+              { id: 1002, label: "RPT-002 — Inappropriate language" },
+            ],
+          },
+        },
+      ];
+
+      /* 6. COUPONS */
+      const COUPONS = [
+        {
+          pk: 501,
+          code: "SAVE20",
+          type: "Percentage",
+          discount: "20%",
+          expires: "31 Dec 2024",
+          related: {
+            Orders: [
+              { id: 201, label: "Order #1001" },
+              { id: 202, label: "Order #1002" },
+              { id: 203, label: "Order #1003" },
+            ],
+          },
+        },
+        {
+          pk: 502,
+          code: "FLAT15",
+          type: "Fixed",
+          discount: "$15.00",
+          expires: "30 Jun 2024",
+          related: { Orders: [{ id: 204, label: "Order #1004" }] },
+        },
+        {
+          pk: 503,
+          code: "WELCOME10",
+          type: "Percentage",
+          discount: "10%",
+          expires: "31 Dec 2024",
+          related: {},
+        },
+        {
+          pk: 504,
+          code: "FREESHIP",
+          type: "Shipping",
+          discount: "100%",
+          expires: "30 Sep 2024",
+          related: {},
+        },
+        {
+          pk: 505,
+          code: "VIP50",
+          type: "Percentage",
+          discount: "50%",
+          expires: "15 May 2024",
+          related: {
+            Orders: [{ id: 205, label: "Order #1005" }],
+            Campaigns: [{ id: 1101, label: "Summer VIP Campaign" }],
+          },
+        },
+      ];
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+     MOCK FETCH — intercepts all 6 model endpoints
+══════════════════════════════════════════════════════════════ -->
+    <script>
+      (function () {
+        const _real = window.fetch.bind(window);
+
+        const MODEL_MAP = {
+          users: USERS,
+          products: PRODUCTS,
+          orders: ORDERS,
+          invoices: INVOICES,
+          reviews: REVIEWS,
+          coupons: COUPONS,
+        };
+
+        window.fetch = async (url, opts = {}) => {
+          await new Promise((r) => setTimeout(r, 300 + Math.random() * 200));
+
+          // GET /api/<model>/<pk>/related/
+          const relMatch = url.match(/\/api\/(\w+)\/(\d+)\/related\//);
+          if (relMatch) {
+            const list = MODEL_MAP[relMatch[1]];
+            if (!list) return mock({}, 404);
+            const item = list.find((i) => i.pk === +relMatch[2]);
+            if (!item) return mock({}, 404);
+            return mock(item.related || {});
+          }
+
+          // DELETE /api/<model>/<pk>/delete/
+          const delMatch = url.match(/\/api\/(\w+)\/(\d+)\/delete\//);
+          if (delMatch && opts.method === "DELETE") {
+            const list = MODEL_MAP[delMatch[1]];
+            if (!list) return mock({ detail: "Not found." }, 404);
+            const idx = list.findIndex((i) => i.pk === +delMatch[2]);
+            if (idx === -1) return mock({ detail: "Not found." }, 404);
+            const item = list[idx];
+            const hasData = Object.keys(item.related || {}).some(
+              (k) => item.related[k]?.length,
+            );
+            if (hasData)
+              return mock(
+                { detail: "Cannot delete: record still has linked data." },
+                409,
+              );
+            list.splice(idx, 1);
+            return mock({
+              message: `"${item.name || item.ref || item.code || item.reviewer || "Record"}" was deleted successfully.`,
+              pk: item.pk,
+            });
+          }
+
+          return _real(url, opts);
+        };
+
+        function mock(data, status = 200) {
+          return {
+            ok: status >= 200 && status < 300,
+            status,
+            json: async () => data,
+          };
+        }
+      })();
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+     RENDERERS — one per table
+══════════════════════════════════════════════════════════════ -->
+    <script>
+      const ROLE_COLORS = {
+        Admin: "#6366f1",
+        Editor: "#3b82f6",
+        Viewer: "#64748b",
+      };
+      const hasRelated = (item) =>
+        Object.keys(item.related || {}).some((k) => item.related[k]?.length);
+
+      function linkedBadge(item) {
+        return hasRelated(item)
+          ? `<span class="linked-badge yes"><i class="bi bi-link-45deg"></i>Linked</span>`
+          : `<span class="linked-badge no"><i class="bi bi-check2"></i>None</span>`;
+      }
+
+      function actionBtns(model, item) {
+        const displayName =
+          item.name || item.ref || item.code || item.reviewer || `#${item.pk}`;
+        return `
+    <div class="action-group">
+      <button class="btn-action" title="View"><i class="bi bi-eye"></i></button>
+      <button class="btn-action" title="Edit"><i class="bi bi-pencil"></i></button>
+      <button class="btn-action danger"
+        title="Delete ${displayName}"
+        data-delete-url="/api/${model}/${item.pk}/delete/"
+        data-related-url="/api/${model}/${item.pk}/related/"
+        data-model-name="${displayName}"
+        data-row-id="${model}-row-${item.pk}"
+        data-on-success="handleDeleted"
+        aria-label="Delete ${displayName}">
+        <i class="bi bi-trash3"></i>
+      </button>
+    </div>`;
+      }
+
+      /* ── Users ── */
+      function renderUsers(list = USERS) {
+        const tbody = document.getElementById("users-tbody");
+        tbody.innerHTML = list.length
+          ? list
+              .map(
+                (u) => `
+    <tr id="users-row-${u.pk}" data-pk="${u.pk}" data-model="users">
+      <td><input type="checkbox" style="accent-color:var(--brand)"/></td>
+      <td><div class="name-cell">
+        <div class="name-av round" style="background:${u.color}">${u.initials}</div>
+        <div><div class="name-primary">${u.name}</div><div class="name-secondary">${u.email}</div></div>
+      </div></td>
+      <td><span style="font-size:.8rem;font-weight:600;color:${ROLE_COLORS[u.role] || "#64748b"}">${u.role}</span></td>
+      <td><span class="badge-pill ${u.status === "active" ? "green" : u.status === "pending" ? "amber" : "red"}">
+        <i class="bi bi-circle-fill"></i>${u.status.charAt(0).toUpperCase() + u.status.slice(1)}
+      </span></td>
+      <td style="color:var(--text-3);font-size:.84rem">${u.joined}</td>
+      <td>${linkedBadge(u)}</td>
+      <td>${actionBtns("users", u)}</td>
+    </tr>`,
+              )
+              .join("")
+          : `<tr class="empty-row"><td colspan="7"><i class="bi bi-people empty-icon"></i>No users found.</td></tr>`;
+        document.getElementById("users-count").textContent =
+          `${USERS.length} users total`;
+        document.getElementById("users-showing").textContent = list.length;
+        document.getElementById("users-total").textContent = USERS.length;
+      }
+
+      /* ── Products ── */
+      function renderProducts(list = PRODUCTS) {
+        const CAT_COLORS = {
+          Electronics: "blue",
+          Furniture: "green",
+          Accessories: "purple",
+        };
+        const tbody = document.getElementById("products-tbody");
+        tbody.innerHTML = list.length
+          ? list
+              .map((p) => {
+                const stockPct = Math.min(
+                  100,
+                  Math.round((p.stock / 120) * 100),
+                );
+                const stockColor =
+                  p.stock < 10
+                    ? "#ef4444"
+                    : p.stock < 30
+                      ? "#f59e0b"
+                      : "#22c55e";
+                return `
+    <tr id="products-row-${p.pk}" data-pk="${p.pk}" data-model="products">
+      <td><input type="checkbox" style="accent-color:var(--brand)"/></td>
+      <td><div class="name-cell">
+        <div class="name-av" style="background:${p.color}"><i class="bi bi-box" style="font-size:.85rem;font-weight:normal"></i></div>
+        <div><div class="name-primary">${p.name}</div><div class="name-secondary">${p.sku}</div></div>
+      </div></td>
+      <td><span class="badge-pill ${CAT_COLORS[p.category] || "slate"}">${p.category}</span></td>
+      <td style="font-weight:600;color:var(--text-1)">${p.price}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.5rem">
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${stockPct}%;background:${stockColor}"></div></div>
+          <span style="font-size:.8rem;color:var(--text-3)">${p.stock}</span>
+        </div>
+      </td>
+      <td>${linkedBadge(p)}</td>
+      <td>${actionBtns("products", p)}</td>
+    </tr>`;
+              })
+              .join("")
+          : `<tr class="empty-row"><td colspan="7"><i class="bi bi-box-seam empty-icon"></i>No products found.</td></tr>`;
+        document.getElementById("products-count").textContent =
+          `${PRODUCTS.length} products total`;
+        document.getElementById("products-showing").textContent = list.length;
+        document.getElementById("products-total").textContent = PRODUCTS.length;
+      }
+
+      /* ── Orders ── */
+      function renderOrders(list = ORDERS) {
+        const STATUS = {
+          delivered: { cls: "green", icon: "bi-check-circle-fill" },
+          processing: { cls: "blue", icon: "bi-arrow-repeat" },
+          pending: { cls: "amber", icon: "bi-hourglass-split" },
+          cancelled: { cls: "red", icon: "bi-x-circle-fill" },
+        };
+        const tbody = document.getElementById("orders-tbody");
+        tbody.innerHTML = list.length
+          ? list
+              .map((o) => {
+                const s = STATUS[o.status] || {
+                  cls: "slate",
+                  icon: "bi-circle",
+                };
+                return `
+    <tr id="orders-row-${o.pk}" data-pk="${o.pk}" data-model="orders">
+      <td><input type="checkbox" style="accent-color:var(--brand)"/></td>
+      <td><span style="font-weight:700;color:var(--text-1);font-family:ui-monospace,monospace">${o.ref}</span>
+        <div style="font-size:.75rem;color:var(--text-3)">${o.date}</div></td>
+      <td><span style="font-size:.875rem;font-weight:500">${o.customer}</span></td>
+      <td><span class="badge-pill ${s.cls}"><i class="bi ${s.icon}"></i>${o.status.charAt(0).toUpperCase() + o.status.slice(1)}</span></td>
+      <td style="font-weight:700;color:var(--text-1)">${o.total}</td>
+      <td>${linkedBadge(o)}</td>
+      <td>${actionBtns("orders", o)}</td>
+    </tr>`;
+              })
+              .join("")
+          : `<tr class="empty-row"><td colspan="7"><i class="bi bi-cart3 empty-icon"></i>No orders found.</td></tr>`;
+        document.getElementById("orders-count").textContent =
+          `${ORDERS.length} orders total`;
+        document.getElementById("orders-showing").textContent = list.length;
+        document.getElementById("orders-total").textContent = ORDERS.length;
+      }
+
+      /* ── Invoices ── */
+      function renderInvoices(list = INVOICES) {
+        const STATUS = {
+          paid: { cls: "green" },
+          pending: { cls: "amber" },
+          overdue: { cls: "red" },
+        };
+        const tbody = document.getElementById("invoices-tbody");
+        tbody.innerHTML = list.length
+          ? list
+              .map((inv) => {
+                const s = STATUS[inv.status] || { cls: "slate" };
+                return `
+    <tr id="invoices-row-${inv.pk}" data-pk="${inv.pk}" data-model="invoices">
+      <td><input type="checkbox" style="accent-color:var(--brand)"/></td>
+      <td><span style="font-weight:700;font-family:ui-monospace,monospace;font-size:.84rem;color:var(--text-1)">${inv.ref}</span></td>
+      <td>${inv.issuedTo}</td>
+      <td><span class="badge-pill ${s.cls}">${inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}</span></td>
+      <td style="font-weight:700;color:var(--text-1)">${inv.amount}</td>
+      <td style="font-size:.84rem;color:var(--text-3)">${inv.due}</td>
+      <td>${linkedBadge(inv)}</td>
+      <td>${actionBtns("invoices", inv)}</td>
+    </tr>`;
+              })
+              .join("")
+          : `<tr class="empty-row"><td colspan="8"><i class="bi bi-file-text empty-icon"></i>No invoices found.</td></tr>`;
+        document.getElementById("invoices-count").textContent =
+          `${INVOICES.length} invoices total`;
+        document.getElementById("invoices-showing").textContent = list.length;
+        document.getElementById("invoices-total").textContent = INVOICES.length;
+      }
+
+      /* ── Reviews ── */
+      function renderReviews(list = REVIEWS) {
+        const STATUS = {
+          approved: { cls: "green" },
+          pending: { cls: "amber" },
+          flagged: { cls: "red" },
+        };
+        const tbody = document.getElementById("reviews-tbody");
+        tbody.innerHTML = list.length
+          ? list
+              .map((r) => {
+                const s = STATUS[r.status] || { cls: "slate" };
+                const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+                return `
+    <tr id="reviews-row-${r.pk}" data-pk="${r.pk}" data-model="reviews">
+      <td><input type="checkbox" style="accent-color:var(--brand)"/></td>
+      <td><span style="font-weight:600;color:var(--text-1)">${r.reviewer}</span></td>
+      <td style="color:var(--text-2)">${r.product}</td>
+      <td><span class="stars">${stars}</span><span style="font-size:.78rem;color:var(--text-3);margin-left:.3rem">${r.rating}/5</span></td>
+      <td><span class="badge-pill ${s.cls}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span></td>
+      <td>${linkedBadge(r)}</td>
+      <td>${actionBtns("reviews", r)}</td>
+    </tr>`;
+              })
+              .join("")
+          : `<tr class="empty-row"><td colspan="7"><i class="bi bi-chat-dots empty-icon"></i>No reviews found.</td></tr>`;
+        document.getElementById("reviews-count").textContent =
+          `${REVIEWS.length} reviews total`;
+        document.getElementById("reviews-showing").textContent = list.length;
+        document.getElementById("reviews-total").textContent = REVIEWS.length;
+      }
+
+      /* ── Coupons ── */
+      function renderCoupons(list = COUPONS) {
+        const TYPE = { Percentage: "purple", Fixed: "cyan", Shipping: "blue" };
+        const tbody = document.getElementById("coupons-tbody");
+        tbody.innerHTML = list.length
+          ? list
+              .map(
+                (c) => `
+    <tr id="coupons-row-${c.pk}" data-pk="${c.pk}" data-model="coupons">
+      <td><input type="checkbox" style="accent-color:var(--brand)"/></td>
+      <td><span style="font-weight:700;font-family:ui-monospace,monospace;background:#f5f3ff;color:#6d28d9;padding:.2rem .6rem;border-radius:6px;font-size:.85rem">${c.code}</span></td>
+      <td><span class="badge-pill ${TYPE[c.type] || "slate"}">${c.type}</span></td>
+      <td style="font-weight:700;color:var(--text-1)">${c.discount}</td>
+      <td style="font-size:.84rem;color:var(--text-3)">${c.expires}</td>
+      <td>${linkedBadge(c)}</td>
+      <td>${actionBtns("coupons", c)}</td>
+    </tr>`,
+              )
+              .join("")
+          : `<tr class="empty-row"><td colspan="7"><i class="bi bi-tag empty-icon"></i>No coupons found.</td></tr>`;
+        document.getElementById("coupons-count").textContent =
+          `${COUPONS.length} coupons total`;
+        document.getElementById("coupons-showing").textContent = list.length;
+        document.getElementById("coupons-total").textContent = COUPONS.length;
+      }
+
+      /* ── Filter dispatcher ── */
+      function filterTable(model, q) {
+        const ql = q.toLowerCase();
+        const MAP = {
+          users: () =>
+            renderUsers(
+              ql
+                ? USERS.filter(
+                    (u) =>
+                      u.name.toLowerCase().includes(ql) ||
+                      u.email.toLowerCase().includes(ql),
+                  )
+                : USERS,
+            ),
+          products: () =>
+            renderProducts(
+              ql
+                ? PRODUCTS.filter(
+                    (p) =>
+                      p.name.toLowerCase().includes(ql) ||
+                      p.sku.toLowerCase().includes(ql),
+                  )
+                : PRODUCTS,
+            ),
+          orders: () =>
+            renderOrders(
+              ql
+                ? ORDERS.filter(
+                    (o) =>
+                      o.ref.toLowerCase().includes(ql) ||
+                      o.customer.toLowerCase().includes(ql),
+                  )
+                : ORDERS,
+            ),
+          invoices: () =>
+            renderInvoices(
+              ql
+                ? INVOICES.filter(
+                    (i) =>
+                      i.ref.toLowerCase().includes(ql) ||
+                      i.issuedTo.toLowerCase().includes(ql),
+                  )
+                : INVOICES,
+            ),
+          reviews: () =>
+            renderReviews(
+              ql
+                ? REVIEWS.filter(
+                    (r) =>
+                      r.reviewer.toLowerCase().includes(ql) ||
+                      r.product.toLowerCase().includes(ql),
+                  )
+                : REVIEWS,
+            ),
+          coupons: () =>
+            renderCoupons(
+              ql
+                ? COUPONS.filter(
+                    (c) =>
+                      c.code.toLowerCase().includes(ql) ||
+                      c.type.toLowerCase().includes(ql),
+                  )
+                : COUPONS,
+            ),
+        };
+        MAP[model]?.();
+      }
+
+      /* Boot — render all 6 tables */
+      renderUsers();
+      renderProducts();
+      renderOrders();
+      renderInvoices();
+      renderReviews();
+      renderCoupons();
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+     tryDelete.js v2.0  (inline)
+══════════════════════════════════════════════════════════════ -->
+    <script>
+      const TryDelete = (() => {
+    "use strict";
+    const STYLE_ID = "tyd-styles";
+    const CSS = `
+        .tyd-modal .modal-dialog{max-width:520px}
+        .tyd-modal .modal-dialog.tyd-wide{max-width:640px}
+        .tyd-modal .modal-content{border:none;border-radius:20px;overflow:hidden;font-family:inherit;box-shadow:0 24px 64px rgba(0,0,0,.16),0 8px 24px rgba(0,0,0,.08);animation:tyd-pop .22s cubic-bezier(.34,1.26,.64,1)}
+        @keyframes tyd-pop{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+        .tyd-hdr{padding:1.35rem 1.5rem 1.15rem;display:flex;gap:1rem;align-items:flex-start}
+        .tyd-hdr-safe   {background:linear-gradient(145deg,#e63946,#9b1015)}
+        .tyd-hdr-blocked{background:linear-gradient(145deg,#334155,#0f172a)}
+        .tyd-hdr-error  {background:linear-gradient(145deg,#b45309,#78350f)}
+        .tyd-hdr-icon{width:44px;height:44px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.25rem;background:rgba(255,255,255,.16);color:#fff}
+        .tyd-hdr-text{flex:1;min-width:0}
+        .tyd-hdr-text h5{color:#fff;font-size:1.05rem;font-weight:700;margin:0 0 .1rem;letter-spacing:-.01em}
+        .tyd-hdr-text p{color:rgba(255,255,255,.68);font-size:.8rem;margin:0}
+        .tyd-close{background:rgba(255, 255, 255, 0.15);border:none;color:#fff;border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:.85rem;transition:background 150ms}
+        .tyd-close:hover{background:rgba(255,255,255,.28)}
+        .tyd-body{padding:1.4rem 1.5rem}
+        .tyd-pill{display:inline-flex;align-items:center;gap:.4rem;background:#fff1f1;color:#c1121f;border:1px solid #ffc0c0;border-radius:6px;padding:.28rem .7rem;font-weight:600;font-size:.875rem;max-width:100%;word-break:break-all;font-family:ui-monospace,monospace}
+        .tyd-intent{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.2rem}
+        .tyd-intent-icon{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+        .tyd-intent-icon.safe   {background:#fff1f1;color:#e63946}
+        .tyd-intent-icon.blocked{background:#fffbeb;color:#f59e0b}
+        .tyd-intent-icon.error  {background:#fff7ed;color:#b45309}
+        .tyd-intent-body p{font-size:.845rem;color:#64748b;margin:.4rem 0 0}
+        .tyd-banner,.tyd-err-banner{display:flex;gap:.75rem;align-items:flex-start;border-radius:10px;padding:.85rem 1rem;font-size:.845rem;margin-bottom:1.1rem}
+        .tyd-banner    {background:#fffbeb;border:1px solid #fde68a;color:#334155}
+        .tyd-err-banner{background:#fff7ed;border:1px solid #fed7aa;color:#334155}
+        .tyd-banner>i,.tyd-err-banner>i{font-size:1rem;flex-shrink:0;margin-top:.1rem}
+        .tyd-banner>i{color:#d97706}.tyd-err-banner>i{color:#b45309}
+        .tyd-group{border:1px solid #e2e8f0;border-radius:14px;overflow:hidden}
+        .tyd-group-head{background:#f8fafc;padding:.55rem 1rem;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b}
+        .tyd-group-head .tyd-badge{margin-left:auto;background:#e63946;color:#fff;border-radius:20px;padding:.1em .55em;font-size:.72rem;font-weight:700}
+        .tyd-items{list-style:none;margin:0;padding:0;max-height:190px;overflow-y:auto}
+        .tyd-items::-webkit-scrollbar{width:4px}.tyd-items::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:4px}
+        .tyd-items li{display:flex;align-items:center;gap:.6rem;padding:.5rem 1rem;font-size:.845rem;color:#475569;border-bottom:1px solid #f8fafc}
+        .tyd-items li:last-child{border-bottom:none}
+        .tyd-items li>i{color:#cbd5e1;font-size:.7rem;flex-shrink:0}
+        .tyd-bool-block{border:1px solid #e2e8f0;border-radius:14px;padding:1.5rem;text-align:center;background:#f8fafc}
+        .tyd-bool-icon{width:52px;height:52px;background:#fffbeb;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1.4rem;color:#f59e0b;margin-bottom:.8rem}
+        .tyd-bool-block h6{font-size:.95rem;font-weight:700;color:#334155;margin-bottom:.3rem}
+        .tyd-bool-block p{font-size:.82rem;color:#94a3b8;margin:0}
+        .tyd-tabs{display:flex;gap:.2rem;flex-wrap:wrap;margin-bottom:1rem;border-bottom:2px solid #f1f5f9}
+        .tyd-tab{display:inline-flex;align-items:center;gap:.4rem;padding:.42rem .85rem;font-size:.82rem;font-weight:500;color:#64748b;background:none;border:2px solid transparent;border-bottom:none;border-radius:10px 10px 0 0;cursor:pointer;position:relative;bottom:-2px;transition:color 150ms,background 150ms}
+        .tyd-tab:hover{color:#334155;background:#f8fafc}
+        .tyd-tab.active{color:#c1121f;font-weight:600;border-color:#e2e8f0;border-bottom-color:#fff;background:#fff}
+        .tyd-tab .tc{font-size:.68rem;background:#e63946;color:#fff;border-radius:20px;padding:.1em .5em;font-weight:700}
+        .tyd-pane{display:none}.tyd-pane.active{display:block}
+        .tyd-pane-scroll{max-height:210px;overflow-y:auto;border-radius:10px;border:1px solid #e2e8f0}
+        .tyd-pane-scroll::-webkit-scrollbar{width:4px}.tyd-pane-scroll::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:4px}
+        .tyd-loading-body{padding:2.5rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:.85rem}
+        .tyd-spinner{width:34px;height:34px;border:3px solid #f1f5f9;border-top-color:#94a3b8;border-radius:50%;animation:tyd-spin .7s linear infinite}
+        @keyframes tyd-spin{to{transform:rotate(360deg)}}
+        .tyd-loading-label{font-size:.875rem;color:#94a3b8}
+        .tyd-footer{padding:1rem 1.5rem;background:#f8fafc;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end;gap:.6rem;align-items:center}
+        .tyd-footer-meta{flex:1;font-size:.72rem;color:#94a3b8;font-family:ui-monospace,monospace}
+        .btn-tyd{display:inline-flex;align-items:center;gap:.4rem;font-family:inherit;font-size:.845rem;font-weight:600;padding:.48rem 1.1rem;border-radius:10px;cursor:pointer;border:1.5px solid transparent;white-space:nowrap;line-height:1.4;transition:transform 150ms,box-shadow 150ms,opacity 150ms,background 150ms,border-color 150ms}
+        .btn-tyd:disabled{opacity:.65;cursor:not-allowed;transform:none!important}
+        .btn-tyd-cancel{background:#fff;border-color:#e2e8f0;color:#475569}
+        .btn-tyd-cancel:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+        .btn-tyd-delete{background:linear-gradient(145deg,#e63946,#9b1015);color:#fff;box-shadow:0 2px 8px rgba(230,57,70,.28)}
+        .btn-tyd-delete:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 16px rgba(230,57,70,.38)}
+        .btn-tyd-ok   {background:linear-gradient(145deg,#334155,#0f172a);color:#fff}
+        .btn-tyd-ok:hover:not(:disabled){opacity:.88}
+        .btn-tyd-retry{background:linear-gradient(145deg,#b45309,#78350f);color:#fff}
+        .btn-tyd-retry:hover:not(:disabled){opacity:.88}
+        .btn-spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:tyd-spin .65s linear infinite;display:none;flex-shrink:0}
+        .btn-spin.on{display:block}
+        .tyd-toasts{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
+        .tyd-toast{display:flex;align-items:center;gap:.65rem;background:#1e293b;color:#fff;padding:.75rem 1rem;border-radius:14px;font-size:.845rem;font-family:inherit;box-shadow:0 12px 40px rgba(0,0,0,.12);pointer-events:all;border-left:4px solid transparent;animation:tyd-tin .2s ease}
+        .tyd-toast.success{border-left-color:#22c55e}.tyd-toast.success i{color:#22c55e}
+        .tyd-toast.danger {border-left-color:#e63946}.tyd-toast.danger  i{color:#e63946}
+        .tyd-toast.warning{border-left-color:#f59e0b}.tyd-toast.warning i{color:#f59e0b}
+        .tyd-toast i{font-size:.95rem;flex-shrink:0}
+        .tyd-toast-x{margin-left:auto;background:none;border:none;color:#64748b;cursor:pointer;padding:0 0 0 .5rem;font-size:.9rem;line-height:1}
+        .tyd-toast.out{animation:tyd-tout .2s ease forwards}
+        @keyframes tyd-tin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+        @keyframes tyd-tout{to{opacity:0;transform:translateY(6px)}}
+    `;
+        function injectStyles() {
+          if (!document.getElementById(STYLE_ID)) {
+            const s = document.createElement("style");
+            s.id = STYLE_ID;
+            s.textContent = CSS;
+            document.head.appendChild(s);
+          }
+        }
+        let _modalEl = null,
+          _bsModal = null,
+          _abortCtrl = null,
+          _uid = 0;
+        const uid = () => "tyd" + ++_uid + Date.now();
+        const el = (id, sfx = "") => document.getElementById(id + sfx);
+        const esc = (s) =>
+          s == null
+            ? ""
+            : String(s)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        const labelOf = (item) =>
+          typeof item !== "object" || !item
+            ? esc(String(item))
+            : esc(
+                item.label ||
+                  item.name ||
+                  item.title ||
+                  item.display ||
+                  "#" + (item.id ?? "?"),
+              );
+        const extractError = (body, status) =>
+          body.detail || body.message || body.error || `HTTP ${status}`;
+        function resolveCSRF(override) {
+          if (override) return override;
+          const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+          if (m) return decodeURIComponent(m[1]);
+          return (
+            document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content") || ""
+          );
+        }
+        function cleanRelated(raw) {
+          if (!raw || typeof raw !== "object" || Array.isArray(raw))
+            return null;
+          const out = {};
+          for (const k of Object.keys(raw)) {
+            if (Array.isArray(raw[k]) && raw[k].length) out[k] = raw[k];
+          }
+          return Object.keys(out).length ? out : null;
+        }
+        function teardown() {
+          if (_abortCtrl) {
+            _abortCtrl.abort();
+            _abortCtrl = null;
+          }
+          try {
+            if (_bsModal) _bsModal.dispose();
+          } catch (_) {}
+          _bsModal = null;
+          if (_modalEl) {
+            _modalEl.remove();
+            _modalEl = null;
+          }
+        }
+        const closeModal = () => _bsModal && _bsModal.hide();
+        const bindClose = (id, sfx) =>
+          el(id, sfx)?.addEventListener("click", closeModal);
+        function scaffold(id) {
+          teardown();
+          const node = document.createElement("div");
+          node.className = "modal fade tyd-modal";
+          node.id = id;
+          node.setAttribute("tabindex", "-1");
+          node.setAttribute("aria-modal", "true");
+          node.setAttribute("role", "dialog");
+          node.innerHTML = `<div class="modal-dialog modal-dialog-centered" id="${id}-dlg"><div class="modal-content">
+      <div class="tyd-hdr tyd-hdr-safe" id="${id}-hdr">
+        <div class="tyd-hdr-icon"><i class="bi bi-hourglass-split"></i></div>
+        <div class="tyd-hdr-text"><h5>Please wait…</h5><p>Checking for related data</p></div>
+        <button class="tyd-close" id="${id}-x" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="tyd-body" id="${id}-body"><div class="tyd-loading-body"><div class="tyd-spinner" role="status"></div><span class="tyd-loading-label">Fetching related data…</span></div></div>
+      <div class="tyd-footer" id="${id}-ftr" style="visibility:hidden"><span class="tyd-footer-meta" id="${id}-meta"></span></div>
+    </div></div>`;
+          document.body.appendChild(node);
+          return node;
+        }
+        function setHeader(id, { cls, icon, title, sub }) {
+          const hdr = el(id, "-hdr");
+          hdr.className = "tyd-hdr " + cls;
+          hdr.innerHTML = `<div class="tyd-hdr-icon"><i class="bi ${icon}"></i></div><div class="tyd-hdr-text"><h5>${esc(title)}</h5><p>${esc(sub)}</p></div><button class="tyd-close" id="${id}-x" aria-label="Close"><i class="bi bi-x-lg"></i></button>`;
+          bindClose(id, "-x");
+        }
+        const setBody = (id, html) => {
+          el(id, "-body").innerHTML = html;
+        };
+        function setFooter(id, btns, meta = "") {
+          const ftr = el(id, "-ftr");
+          el(id, "-meta").textContent = meta;
+          ftr.querySelectorAll(".btn-tyd").forEach((b) => b.remove());
+          ftr.insertAdjacentHTML("beforeend", btns);
+          ftr.style.visibility = "";
+        }
+        const intentRow = (iconCls, iconName, modelName, subtext = "") => `
+    <div class="tyd-intent">
+      <div class="tyd-intent-icon ${iconCls}"><i class="bi ${iconName}"></i></div>
+      <div class="tyd-intent-body">
+        <span class="tyd-pill"><i class="bi bi-record-circle"></i>${esc(modelName)}</span>
+        ${subtext ? `<p>${subtext}</p>` : ""}
+      </div>
+    </div>`;
+        const itemList = (arr) =>
+          arr
+            .map(
+              (item) =>
+                `<li><i class="bi bi-chevron-right"></i>${labelOf(item)}</li>`,
+            )
+            .join("");
+        const blockedHeaderCfg = (sub) => ({
+          cls: "tyd-hdr-blocked",
+          icon: "bi-shield-exclamation",
+          title: "Delete Blocked",
+          sub,
+        });
+        function blockedFooter(id, meta) {
+          setFooter(
+            id,
+            `<button class="btn-tyd btn-tyd-ok" id="${id}-ok" type="button"><i class="bi bi-check2"></i>I Understand</button>`,
+            meta,
+          );
+          bindClose(id, "-ok");
+        }
+        const blockedIntent = (modelName, subtext) =>
+          intentRow("blocked", "bi-shield-exclamation", modelName, subtext);
+        function renderSafe(
+          id,
+          {
+            modelName,
+            deleteUrl,
+            method,
+            csrfTok,
+            onSuccess,
+            onError,
+            triggerEl,
+          },
+        ) {
+          setHeader(id, {
+            cls: "tyd-hdr-safe",
+            icon: "bi-trash3-fill",
+            title: "Confirm Delete",
+            sub: "No linked records found — safe to proceed",
+          });
+          setBody(
+            id,
+            intentRow(
+              "safe",
+              "bi-trash3",
+              modelName,
+              "This action <strong>cannot be undone</strong>. The record will be permanently removed.",
+            ),
+          );
+          setFooter(
+            id,
+            `<button class="btn-tyd btn-tyd-cancel" id="${id}-cancel" type="button"><i class="bi bi-x-lg"></i>Cancel</button>
+       <button class="btn-tyd btn-tyd-delete" id="${id}-confirm" type="button"><span class="btn-spin" id="${id}-spin"></span><i class="bi bi-trash3" id="${id}-ico"></i>Yes, Delete</button>`,
+            "This action is irreversible",
+          );
+          bindClose(id, "-cancel");
+          el(id, "-confirm").addEventListener("click", async () => {
+            const btn = el(id, "-confirm"),
+              spin = el(id, "-spin"),
+              ico = el(id, "-ico");
+            btn.disabled = true;
+            spin.classList.add("on");
+            ico.style.display = "none";
+            try {
+              const res = await fetch(deleteUrl, {
+                method,
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": csrfTok,
+                  "X-Requested-With": "XMLHttpRequest",
+                },
+              });
+              if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                const msg = extractError(body, res.status);
+                if (res.status === 403) throw new Error("Permission denied.");
+                if (res.status === 404)
+                  throw new Error("Record not found — may already be deleted.");
+                if (res.status === 409)
+                  throw new Error(
+                    msg || "Cannot delete: linked records still exist.",
+                  );
+                throw new Error(msg);
+              }
+              const data = await res.json().catch(() => ({}));
+              closeModal();
+              if (typeof onSuccess === "function") onSuccess(data, triggerEl);
+              else {
+                toast(data.message || "Deleted.", "success");
+              }
+            } catch (err) {
+              if (err.name === "AbortError") return;
+              btn.disabled = false;
+              spin.classList.remove("on");
+              ico.style.display = "";
+              if (typeof onError === "function") onError(err, triggerEl);
+              else toast(err.message || "Delete failed.", "danger");
+            }
+          });
+        }
+        function renderBoolBlock(id, { modelName }) {
+          setHeader(id, blockedHeaderCfg("This record has related data"));
+          setBody(
+            id,
+            blockedIntent(
+              modelName,
+              "Remove or reassign all linked records first.",
+            ) +
+              `<div class="tyd-bool-block"><div class="tyd-bool-icon"><i class="bi bi-database-exclamation"></i></div><h6>Related data exists</h6><p>Navigate to the linked records and remove them before retrying.</p></div>`,
+          );
+          blockedFooter(id, "Delete is currently blocked");
+        }
+        function renderSingleBlock(id, { modelName, related }) {
+          const k = Object.keys(related)[0],
+            count = related[k].length;
+          const noun = `${count} ${esc(k)} record${count !== 1 ? "s" : ""}`;
+          setHeader(id, blockedHeaderCfg(`Linked to ${noun}`));
+          setBody(
+            id,
+            blockedIntent(
+              modelName,
+              "Linked to active data. Remove all related records before deleting.",
+            ) +
+              `<div class="tyd-banner"><i class="bi bi-exclamation-triangle-fill"></i><div>Remove all <strong>${noun}</strong> linked to this entry first.</div></div>
+       <div class="tyd-group"><div class="tyd-group-head"><i class="bi bi-collection-fill"></i>${esc(k)}<span class="tyd-badge">${count}</span></div>
+       <ul class="tyd-items" role="list">${itemList(related[k])}</ul></div>`,
+          );
+          blockedFooter(id, `${noun} must be removed`);
+        }
+        function renderMultiBlock(id, { modelName, related }) {
+          const keys = Object.keys(related),
+            total = keys.reduce((s, k) => s + related[k].length, 0);
+          el(id, "-dlg").classList.add("tyd-wide");
+          setHeader(
+            id,
+            blockedHeaderCfg(
+              `${total} linked records across ${keys.length} types`,
+            ),
+          );
+          const tabs = keys
+            .map(
+              (k, i) =>
+                `<button class="tyd-tab${i === 0 ? " active" : ""}" data-tp="${i}" type="button" aria-selected="${i === 0}" role="tab"><i class="bi bi-collection"></i>${esc(k)}<span class="tc">${related[k].length}</span></button>`,
+            )
+            .join("");
+          const panes = keys
+            .map(
+              (k, i) =>
+                `<div class="tyd-pane${i === 0 ? " active" : ""}" id="${id}-pane-${i}" role="tabpanel"><div class="tyd-pane-scroll"><ul class="tyd-items" role="list">${itemList(related[k])}</ul></div></div>`,
+            )
+            .join("");
+          setBody(
+            id,
+            blockedIntent(
+              modelName,
+              `<strong>${total} linked records</strong> across <strong>${keys.length} types</strong>. All must be removed first.`,
+            ) +
+              `<div class="tyd-banner"><i class="bi bi-exclamation-triangle-fill"></i><div>Review each related type below and clear them all before retrying.</div></div>
+       <div class="tyd-tabs" id="${id}-tabs" role="tablist">${tabs}</div><div id="${id}-panes">${panes}</div>`,
+          );
+          blockedFooter(id, `${total} total linked records`);
+          el(id, "-tabs").addEventListener("click", (e) => {
+            const btn = e.target.closest(".tyd-tab");
+            if (!btn) return;
+            el(id, "-tabs")
+              .querySelectorAll(".tyd-tab")
+              .forEach((b) => {
+                b.classList.remove("active");
+                b.setAttribute("aria-selected", "false");
+              });
+            el(id, "-panes")
+              .querySelectorAll(".tyd-pane")
+              .forEach((p) => p.classList.remove("active"));
+            btn.classList.add("active");
+            btn.setAttribute("aria-selected", "true");
+            el(id, "-pane-" + btn.dataset.tp).classList.add("active");
+          });
+        }
+        function renderError(id, { modelName, errMsg, retryFn }) {
+          setHeader(id, {
+            cls: "tyd-hdr-error",
+            icon: "bi-wifi-off",
+            title: "Could Not Load",
+            sub: "Failed to fetch related data",
+          });
+          setBody(
+            id,
+            intentRow("error", "bi-exclamation-triangle", modelName) +
+              `<div class="tyd-err-banner"><i class="bi bi-exclamation-circle-fill"></i><div><strong>Unable to verify related data.</strong><br><code style="font-size:.8rem;opacity:.75">${esc(errMsg)}</code><br><span style="font-size:.82rem;display:block;margin-top:.25rem">Delete is hidden until the check succeeds.</span></div></div>`,
+          );
+          setFooter(
+            id,
+            `<button class="btn-tyd btn-tyd-cancel" id="${id}-cancel2" type="button"><i class="bi bi-x-lg"></i>Cancel</button>
+       <button class="btn-tyd btn-tyd-retry" id="${id}-retry" type="button"><i class="bi bi-arrow-clockwise"></i>Retry</button>`,
+            "Delete blocked until check succeeds",
+          );
+          bindClose(id, "-cancel2");
+          el(id, "-retry").addEventListener("click", retryFn);
+        }
+        async function open(config = {}) {
+          const {
+            deleteUrl,
+            relatedUrl = null,
+            modelName = "this record",
+            method = "DELETE",
+            hasRelatedData = null,
+            onSuccess = null,
+            onError = null,
+            csrfToken = null,
+            triggerEl = null,
+          } = config;
+          if (!deleteUrl) {
+            console.error("[tryDelete] deleteUrl is required.");
+            return;
+          }
+          injectStyles();
+          const id = uid();
+          _modalEl = scaffold(id);
+          _bsModal = new bootstrap.Modal(_modalEl, {
+            keyboard: false,
+            backdrop: "static",
+          });
+          _modalEl.addEventListener("hidden.bs.modal", () => {
+            if (triggerEl?.focus) triggerEl.focus();
+            _modalEl?.remove();
+            _modalEl = null;
+            _bsModal = null;
+          });
+          bindClose(id, "-x");
+          _bsModal.show();
+          const csrfTok = resolveCSRF(csrfToken);
+          let related = null,
+            boolBlock = false,
+            fetchError = null;
+          if (relatedUrl) {
+            _abortCtrl = new AbortController();
+            try {
+              const res = await fetch(relatedUrl, {
+                signal: _abortCtrl.signal,
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+              });
+              _abortCtrl = null;
+              if (!res.ok) {
+                const b = await res.json().catch(() => ({}));
+                throw new Error(extractError(b, res.status));
+              }
+              related = cleanRelated(await res.json());
+            } catch (err) {
+              _abortCtrl = null;
+              if (err.name === "AbortError") return;
+              fetchError = err.message || "Unknown error";
+            }
+          } else if (hasRelatedData === true) {
+            boolBlock = true;
+          } else if (hasRelatedData && typeof hasRelatedData === "object") {
+            related = cleanRelated(hasRelatedData);
+          }
+          if (!_modalEl || _modalEl.id !== id) return;
+          const ctx = {
+            modelName,
+            deleteUrl,
+            method,
+            csrfTok,
+            onSuccess,
+            onError,
+            triggerEl,
+            related,
+          };
+          if (fetchError)
+            renderError(id, {
+              modelName,
+              errMsg: fetchError,
+              retryFn: () => {
+                closeModal();
+                setTimeout(() => open(config), 60);
+              },
+            });
+          else if (!related && !boolBlock) renderSafe(id, ctx);
+          else if (boolBlock) renderBoolBlock(id, ctx);
+          else if (Object.keys(related).length === 1)
+            renderSingleBlock(id, ctx);
+          else renderMultiBlock(id, ctx);
+        }
+        function toast(msg, type = "success", duration = 4500) {
+          let wrap = document.getElementById("_tydToasts");
+          if (!wrap) {
+            wrap = document.createElement("div");
+            wrap.id = "_tydToasts";
+            wrap.className = "tyd-toasts";
+            document.body.appendChild(wrap);
+          }
+          const icons = {
+            success: "bi-check-circle-fill",
+            danger: "bi-x-circle-fill",
+            warning: "bi-exclamation-triangle-fill",
+          };
+          const t = document.createElement("div");
+          t.className = `tyd-toast ${type}`;
+          t.setAttribute("role", "status");
+          t.setAttribute("aria-live", "polite");
+          t.innerHTML = `<i class="bi ${icons[type] || "bi-info-circle-fill"}"></i><span>${esc(msg)}</span><button class="tyd-toast-x" aria-label="Close"><i class="bi bi-x"></i></button>`;
+          wrap.appendChild(t);
+          const dismiss = () => {
+            t.classList.add("out");
+            setTimeout(() => t.remove(), 220);
+          };
+          t.querySelector(".tyd-toast-x").addEventListener("click", dismiss);
+          setTimeout(dismiss, duration);
+        }
+        function init(root = document) {
+          root.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-delete-url]");
+            if (!btn) return;
+            e.preventDefault();
+            let hrd = btn.dataset.hasRelated || null;
+            if (hrd === "true") hrd = true;
+            else if (hrd) {
+              try {
+                hrd = JSON.parse(hrd);
+              } catch (_) {
+                hrd = null;
+              }
+            }
+            const resolveFn = (name) =>
+              name && typeof window[name] === "function" ? window[name] : null;
+            open({
+              deleteUrl: btn.dataset.deleteUrl,
+              relatedUrl: btn.dataset.relatedUrl || null,
+              modelName: btn.dataset.modelName || "this record",
+              method: btn.dataset.method || "DELETE",
+              hasRelatedData: hrd,
+              onSuccess: resolveFn(btn.dataset.onSuccess),
+              onError: resolveFn(btn.dataset.onError),
+              triggerEl: btn,
+            });
+          });
+        }
+        if (document.readyState === "loading")
+          document.addEventListener("DOMContentLoaded", () => init());
+        else init();
+        return { open, init, toast };
+      })();
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+     SHARED CALLBACK — works for ALL 6 tables
+     Detects which model/table the row belongs to via data-model attr
+══════════════════════════════════════════════════════════════ -->
+    <script>
+      /**
+       * Single universal callback shared by all 6 tables.
+       * It finds the row by data-row-id, animates it out,
+       * removes it from the correct mock array, then re-renders
+       * just that table's stats.
+       */
+      function handleDeleted(data, triggerEl) {
+        const rowId = triggerEl?.dataset.rowId;
+        const row = rowId ? document.getElementById(rowId) : null;
+
+        if (row) {
+          const model = row.dataset.model;
+          const pk = parseInt(row.dataset.pk, 10);
+
+          row.classList.add("row-exit");
+          setTimeout(() => {
+            // Remove from the correct live array
+            const MAP = {
+              users: USERS,
+              products: PRODUCTS,
+              orders: ORDERS,
+              invoices: INVOICES,
+              reviews: REVIEWS,
+              coupons: COUPONS,
+            };
+            const arr = MAP[model];
+            if (arr) {
+              const idx = arr.findIndex((i) => i.pk === pk);
+              if (idx !== -1) arr.splice(idx, 1);
+            }
+
+            row.remove();
+
+            // Re-render just the affected table's stats + empty state
+            const RENDERS = {
+              users: renderUsers,
+              products: renderProducts,
+              orders: renderOrders,
+              invoices: renderInvoices,
+              reviews: renderReviews,
+              coupons: renderCoupons,
+            };
+            RENDERS[model]?.();
+          }, 360);
+        }
+
+        TryDelete.toast(
+          data.message || "Record deleted successfully.",
+          "success",
+        );
+      }
+    </script>
+  </body>
+</html>
